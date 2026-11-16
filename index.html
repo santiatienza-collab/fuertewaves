@@ -11,92 +11,51 @@
   <link rel="stylesheet" href="css/style.css">
 </head>
 <body>
-  <header class="nav" id="top">
-    <a class="brand" href="#home"><img src="assets/icon-512.png" alt="" width="34" height="34"><span>FuerteWaves</span></a>
-    <nav class="links" aria-label="Main">
-      <a href="#home" data-i18n="nav_home">Home</a>
-      <a href="#surf" data-i18n="nav_surf">Surf spots</a>
-      <a href="#weather" data-i18n="nav_weather">Weather</a>
-      <a href="#webcams" data-i18n="nav_webcams">Webcams</a>
+  <header class="bar">
+    <a class="brand" href="./"><img src="assets/icon-512.png" alt="" width="32" height="32"><span>FuerteWaves</span></a>
+    <nav class="tabs" role="tablist" aria-label="Sections">
+      <button role="tab" data-tab="surf" class="on" data-i18n="nav_surf">Surf spots</button>
+      <button role="tab" data-tab="weather" data-i18n="nav_weather">Weather</button>
+      <button role="tab" data-tab="cams" data-i18n="nav_webcams">Webcams</button>
     </nav>
     <div class="lang" role="group" aria-label="Language">
-      <button data-lang="en">EN</button><button data-lang="es">ES</button><button data-lang="fr">FR</button><button data-lang="de">DE</button>
+      <button data-lang="en" title="English" aria-label="English"><img src="assets/flags/en.svg" alt="EN"></button>
+      <button data-lang="es" title="Español" aria-label="Español"><img src="assets/flags/es.svg" alt="ES"></button>
+      <button data-lang="fr" title="Français" aria-label="Français"><img src="assets/flags/fr.svg" alt="FR"></button>
+      <button data-lang="de" title="Deutsch" aria-label="Deutsch"><img src="assets/flags/de.svg" alt="DE"></button>
     </div>
   </header>
 
-  <main>
-    <!-- HOME -->
-    <section id="home" class="hero">
-      <div class="wrap hero-grid">
-        <div>
-          <p class="kicker" data-i18n="hero_kicker">Fuerteventura</p>
-          <h1 data-i18n="hero_title">Surf forecast for Fuerteventura</h1>
-          <p class="lead" data-i18n="hero_sub"></p>
-          <div class="cta">
-            <a class="btn primary" href="#surf" data-i18n="cta_surf">Explore surf spots</a>
-            <a class="btn" href="#webcams" data-i18n="cta_cams">Live webcams</a>
-          </div>
-        </div>
-        <div class="live card" id="live"></div>
-      </div>
-      <div class="wrap features">
-        <article class="card feat"><h3 data-i18n="feat_waves_t"></h3><p data-i18n="feat_waves_d"></p></article>
-        <article class="card feat"><h3 data-i18n="feat_wind_t"></h3><p data-i18n="feat_wind_d"></p></article>
-        <article class="card feat"><h3 data-i18n="feat_cams_t"></h3><p data-i18n="feat_cams_d"></p></article>
-        <article class="card feat"><h3 data-i18n="feat_sat_t"></h3><p data-i18n="feat_sat_d"></p></article>
-      </div>
-      <div class="wrap app-teaser card">
-        <img src="assets/icon-512.png" alt="" width="72" height="72">
-        <div><h3 data-i18n="app_title"></h3><p data-i18n="app_sub"></p></div>
-        <span class="pill" data-i18n="app_soon"></span>
-      </div>
+  <main class="layout">
+    <section class="mapcol" aria-label="Map">
+      <div id="spotmap"></div>
+      <select id="spotsel" aria-label="Spot"></select>
     </section>
 
-    <!-- SURFSPOTS -->
-    <section id="surf" class="block">
-      <div class="wrap">
-        <h2 data-i18n="sec_surf_title">Surf spots</h2>
-        <p class="sub" data-i18n="sec_surf_sub"></p>
-        <div class="surf-grid">
-          <div class="map-col"><div id="spotmap" aria-label="Map"></div></div>
-          <div class="panel-col" id="panel"></div>
-        </div>
-      </div>
-    </section>
+    <section class="panel" id="panel">
+      <div id="spothead"></div>
 
-    <!-- TIEMPO -->
-    <section id="weather" class="block alt">
-      <div class="wrap">
-        <h2 data-i18n="sec_weather_title">Weather</h2>
-        <p class="sub" data-i18n="sec_weather_sub"></p>
-        <div class="weather-grid">
-          <div id="wx"></div>
-          <div>
-            <div class="chips" id="satchips"></div>
-            <div id="satmap" aria-label="Satellite"></div>
-            <p class="small muted" data-i18n="sat_credit"></p>
-          </div>
-        </div>
-      </div>
-    </section>
+      <div class="tabpane" id="tab-surf"></div>
 
-    <!-- WEBCAMS -->
-    <section id="webcams" class="block">
-      <div class="wrap">
-        <h2 data-i18n="sec_cams_title">Webcams</h2>
+      <div class="tabpane" id="tab-weather" hidden>
+        <div id="wx"></div>
+        <div class="chips" id="satchips"></div>
+        <div id="satmap" aria-label="Satellite"></div>
+        <p class="small muted" data-i18n="sat_credit"></p>
+      </div>
+
+      <div class="tabpane" id="tab-cams" hidden>
         <p class="sub" data-i18n="sec_cams_sub"></p>
         <div class="cams" id="cams"></div>
       </div>
+
+      <footer class="foot">
+        <p data-i18n="foot_sources"></p>
+        <p data-i18n="foot_cams"></p>
+        <p class="muted" data-i18n="foot_note"></p>
+      </footer>
     </section>
   </main>
-
-  <footer class="footer">
-    <div class="wrap">
-      <p data-i18n="foot_sources"></p>
-      <p data-i18n="foot_cams"></p>
-      <p class="muted" data-i18n="foot_note"></p>
-    </div>
-  </footer>
 
   <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
   <script src="js/data.js"></script>

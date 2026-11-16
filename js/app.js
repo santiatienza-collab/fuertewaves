@@ -272,7 +272,7 @@
   }
 
   /* ------------------------------------------------------------------ estado y render */
-  const state = { spot: SPOTS[0], fc: null, fcErr: null, td: null, dayIdx: 0, muni: null, sat: 'ir' };
+  const state = { tab: 'surf', spot: SPOTS[0], fc: null, fcErr: null, td: null, dayIdx: 0, muni: null, sat: 'ir' };
 
   function errHTML(e) {
     const rate = e && String(e.message).includes('429');
@@ -280,8 +280,10 @@
   }
 
   function renderPanel() {
-    const s = state.spot, el = $('#panel');
-    let html = '<div class="spot-head"><div><h3>' + esc(s.name) + '</h3><div class="zone">' + zoneLabel(s.zone) + '</div></div></div>';
+    const s = state.spot;
+    $('#spothead').innerHTML = '<div class="spot-head"><div><h3>' + esc(s.name) + '</h3><div class="zone">' + zoneLabel(s.zone) + '</div></div></div>';
+    const el = $('#tab-surf');
+    let html = '';
     if (state.fcErr) html += errHTML(state.fcErr);
     else if (!state.fc) html += '<div class="card loading">' + t('loading') + '</div>';
     else {
@@ -292,12 +294,19 @@
     el.innerHTML = html;
   }
 
-  function renderLive() {
-    const el = $('#live'), s = SPOTS[0];
-    if (state.fcErr) { el.innerHTML = errHTML(state.fcErr); return; }
-    if (!state.liveFc) { el.innerHTML = '<div class="loading">' + t('loading') + '</div>'; return; }
-    const hours = state.liveFc.filter((h) => h.time >= nowHour());
-    el.innerHTML = hours.length ? '<div class="lbl" style="margin-bottom:8px">' + t('now_at', esc(s.name)) + '</div>' + heroHTML(hours[0], s) : '';
+  /* pestanas */
+  function showTab(name) {
+    state.tab = name;
+    $$('.tabs button').forEach((b) => b.classList.toggle('on', b.dataset.tab === name));
+    ['surf', 'weather', 'cams'].forEach((n) => { $('#tab-' + n).hidden = n !== name; });
+    if (name === 'weather' && satMap) setTimeout(() => satMap.invalidateSize(), 50);
+    $('#panel').scrollTop = 0;
+  }
+
+  /* selector de spot (movil) */
+  function renderSelect() {
+    const sel = $('#spotsel');
+    sel.innerHTML = SPOTS.slice().sort((x, y) => x.name.localeCompare(y.name)).map((s) => '<option value="' + s.id + '"' + (s.id === state.spot.id ? ' selected' : '') + '>' + esc(s.name) + '</option>').join('');
   }
 
   const WX = {
@@ -330,15 +339,21 @@
 
   function renderCams() {
     const s = state.spot;
-    const list = CAMS.slice().sort((a, b) => distKm(s.lat, s.lon, a.lat, a.lon) - distKm(s.lat, s.lon, b.lat, b.lon));
+    const list = CAMS.slice().sort((x, y) => distKm(s.lat, s.lon, x.lat, x.lon) - distKm(s.lat, s.lon, y.lat, y.lon));
     $('#cams').innerHTML = list.map((c, i) => {
       const page = 'https://www.fuerteventuraplayas.com/' + (lang === 'es' ? 'es' : 'en') + '/webcams/' + c.slug + '/';
-      const player = c.media ? 'https://www.fuerteventuraplayas.com/plyr/index.php?mediaid=' + encodeURIComponent(c.media) : null;
-      return '<article class="card cam' + (i < 2 ? ' near' : '') + '">' +
-        (player ? '<div class="frame"><iframe src="' + player + '" loading="lazy" allowfullscreen allow="autoplay; fullscreen" title="' + esc(c.name) + '"></iframe></div>'
-          : '<div class="frame" style="display:grid;place-items:center;padding:12px;text-align:center" class="note">' + t('cams_site_only') + '</div>') +
-        '<h3>' + (i === 0 ? '★ ' : '') + esc(c.name) + '</h3><a href="' + page + '" target="_blank" rel="noopener">' + t('cams_open') + '</a></article>';
+      const km = distKm(s.lat, s.lon, c.lat, c.lon);
+      const frame = c.media
+        ? '<div class="frame" data-play="' + esc(c.media) + '" data-title="' + esc(c.name) + '" style="background-image:url(' + c.img + ')" role="button" tabindex="0" aria-label="' + esc(c.name) + '"><span class="play"><i></i></span><span class="tag">' + km.toFixed(0) + ' km</span></div>'
+        : '<a class="frame" href="' + page + '" target="_blank" rel="noopener" style="display:block;background-image:url(' + c.img + ')"><span class="nostream">' + t('cams_site_only') + '</span><span class="tag">' + km.toFixed(0) + ' km</span></a>';
+      return '<article class="card cam' + (i < 2 ? ' near' : '') + '">' + frame + '<h3>' + (i === 0 ? '★ ' : '') + esc(c.name) + '</h3><a href="' + page + '" target="_blank" rel="noopener">' + t('cams_open') + '</a></article>';
     }).join('');
+  }
+
+  function playCam(frame) {
+    const url = 'https://www.fuerteventuraplayas.com/plyr/index.php?mediaid=' + encodeURIComponent(frame.dataset.play);
+    frame.innerHTML = '<iframe src="' + url + '" allowfullscreen allow="autoplay; fullscreen" title="' + frame.dataset.title + '"></iframe>';
+    frame.removeAttribute('data-play'); frame.style.cursor = 'default';
   }
 
   /* ------------------------------------------------------------------ mapas */
@@ -346,7 +361,7 @@
   const ESRI = 'https://server.arcgisonline.com/ArcGIS/rest/services/World_Street_Map/MapServer/tile/{z}/{y}/{x}';
   function markerStyle(sel) { return sel ? { radius: 13, fillColor: '#fff', color: '#F5A25D', weight: 4, fillOpacity: 1 } : { radius: 9, fillColor: '#F5A25D', color: '#fff', weight: 3, fillOpacity: 1 }; }
   function initSpotMap() {
-    spotMap = L.map('spotmap', { zoomControl: true, scrollWheelZoom: false }).setView([28.38, -14.02], 9);
+    spotMap = L.map('spotmap', { zoomControl: true, zoomSnap: 0.25 }).setView([28.38, -14.02], 9.5);
     L.tileLayer(ESRI, { maxZoom: 18, attribution: 'Tiles © Esri' }).addTo(spotMap);
     SPOTS.forEach((s) => {
       const m = L.circleMarker([s.lat, s.lon], markerStyle(s.id === state.spot.id)).addTo(spotMap);
@@ -383,7 +398,7 @@
     state.spot = s; state.fc = null; state.fcErr = null; state.td = null; state.dayIdx = 0; state.muni = null;
     Object.keys(markers).forEach((id) => { markers[id].setStyle(markerStyle(id === s.id)); if (id === s.id) markers[id].bringToFront(); });
     if (spotMap) spotMap.panTo([s.lat, s.lon]);
-    renderPanel(); renderCams(); renderWeather();
+    renderSelect(); renderPanel(); renderCams(); renderWeather();
     const [fc, td] = await Promise.allSettled([getForecast(s), getTides(s)]);
     if (state.spot !== s) return;
     if (fc.status === 'fulfilled') state.fc = fc.value; else state.fcErr = fc.reason;
@@ -396,42 +411,38 @@
     $$('[data-i18n]').forEach((el) => { el.textContent = t(el.dataset.i18n); });
     $$('.lang button').forEach((b) => b.classList.toggle('on', b.dataset.lang === lang));
     document.title = 'FuerteWaves · ' + t('hero_title');
-    renderPanel(); renderLive(); renderCams(); renderWeather(); renderSatChips();
+    renderPanel(); renderCams(); renderWeather(); renderSatChips();
   }
 
   document.addEventListener('click', (e) => {
+    const fr = e.target.closest('[data-play]');
+    if (fr) { playCam(fr); return; }
     const b = e.target.closest('button, a');
     if (!b) return;
-    if (b.dataset.lang) { lang = b.dataset.lang; try { localStorage.setItem('fw_lang', lang); } catch (x) {} applyLang(); }
+    if (b.dataset.tab) { showTab(b.dataset.tab); try { history.replaceState(null, "", "#" + b.dataset.tab); } catch (x) {} }
+    else if (b.dataset.lang) { lang = b.dataset.lang; try { localStorage.setItem('fw_lang', lang); } catch (x) {} applyLang(); }
     else if (b.dataset.day !== undefined) { state.dayIdx = +b.dataset.day; renderPanel(); }
     else if (b.dataset.muni) { state.muni = MUNIS.find((m) => m.name === b.dataset.muni); renderWeather(); }
     else if (b.dataset.sat) { setSat(b.dataset.sat); }
     else if (b.dataset.retry !== undefined) {
       Object.keys(sessionStorage).filter((k) => k.startsWith('fc:') || k.startsWith('dl:')).forEach((k) => sessionStorage.removeItem(k));
-      state.liveFc = null; loadLive(); selectSpot(state.spot);
+      selectSpot(state.spot);
     }
   });
 
-  async function loadLive() {
-    try { state.liveFc = await getForecast(SPOTS[0]); } catch (e) { state.fcErr = e; }
-    renderLive();
-  }
-
-  // resaltar la seccion activa en el menu
-  function watchSections() {
-    const links = $$('.links a'), secs = ['home', 'surf', 'weather', 'webcams'].map((id) => document.getElementById(id));
-    const io = new IntersectionObserver((entries) => {
-      entries.forEach((en) => { if (en.isIntersecting) links.forEach((a) => a.classList.toggle('active', a.getAttribute('href') === '#' + en.target.id)); });
-    }, { rootMargin: '-45% 0px -50% 0px' });
-    secs.forEach((s) => io.observe(s));
-  }
+  document.addEventListener('change', (e) => {
+    if (e.target.id === 'spotsel') selectSpot(SPOTS.find((s) => s.id === e.target.value));
+  });
+  document.addEventListener('keydown', (e) => {
+    const fr = e.target.closest && e.target.closest('[data-play]');
+    if (fr && (e.key === 'Enter' || e.key === ' ')) { e.preventDefault(); playCam(fr); }
+  });
 
   /* ------------------------------------------------------------------ arranque */
   initSpotMap();
   initSatMap();
-  watchSections();
   applyLang();
-  loadLive();
+  { const h = (new URLSearchParams(location.search).get("tab") || location.hash.slice(1)); if (["surf", "weather", "cams"].includes(h)) showTab(h); }
   selectSpot(SPOTS[0]);
   window.addEventListener('load', () => { spotMap.invalidateSize(); satMap.invalidateSize(); });
 })();
