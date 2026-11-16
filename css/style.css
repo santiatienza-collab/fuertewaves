@@ -189,12 +189,3 @@ svg.tide { width: 100%; height: 110px; display: block; }
 .hero-card .score .circle { width: 64px; height: 64px; margin: 0 auto 6px; }
 @media (max-width: 560px) { .hero-card { grid-template-columns: repeat(2, minmax(0, 1fr)); } .hero-card .score { padding-top: 0; } }
 
-/* reproductor de musica */
-.music { position: fixed; right: 18px; bottom: 40px; z-index: 1500; width: 240px; border-radius: 14px; overflow: hidden; background: #000; border: 2px solid var(--orange); box-shadow: 0 8px 28px rgba(0,0,0,.55); }
-.music[hidden] { display: none; }
-.music-frame { position: relative; aspect-ratio: 16 / 9; }
-.music-frame iframe { position: absolute; inset: 0; width: 100%; height: 100%; border: 0; }
-.music .unmute { position: absolute; left: 6px; top: 6px; max-width: calc(100% - 12px); line-height: 1.2; text-align: left; z-index: 2; background: var(--orange); color: var(--navy); border: 0; border-radius: 999px; padding: 5px 10px; font: 700 11px var(--display); text-transform: uppercase; cursor: pointer; animation: pulse 1.6s infinite; }
-.music.sound .unmute { display: none; }
-@keyframes pulse { 50% { transform: scale(1.06); } }
-@media (max-width: 900px) { .music { width: 150px; right: 10px; top: 66px; bottom: auto; } .music .unmute { font-size: 9px; padding: 4px 7px; } }
