@@ -438,9 +438,36 @@
     if (fr && (e.key === 'Enter' || e.key === ' ')) { e.preventDefault(); playCam(fr); }
   });
 
+  /* ------------------------------------------------------------------ musica */
+  // The Drums - "Let's Go Surfing" (canal oficial). Los navegadores bloquean el audio automatico:
+  // arranca en silencio y se activa el sonido con el primer toque o clic en cualquier parte de la pagina.
+  const VIDEO = '8dBv4i0dXUc';
+  let ytPlayer = null;
+  function initMusic() {
+    const box = $('#music');
+    window.onYouTubeIframeAPIReady = () => {
+      ytPlayer = new YT.Player('ytplayer', {
+        width: '100%', height: '100%', videoId: VIDEO,
+        playerVars: { autoplay: 1, mute: 1, loop: 1, playlist: VIDEO, playsinline: 1, rel: 0, modestbranding: 1 },
+        events: {
+          onReady: (e) => { e.target.mute(); e.target.playVideo(); },
+          onError: () => { box.hidden = true; },
+        },
+      });
+    };
+    const s = document.createElement('script'); s.src = 'https://www.youtube.com/iframe_api'; document.head.appendChild(s);
+    const unmute = () => {
+      if (ytPlayer && ytPlayer.unMute) { ytPlayer.unMute(); ytPlayer.setVolume(70); ytPlayer.playVideo(); }
+      box.classList.add('sound');
+    };
+    document.addEventListener('pointerdown', unmute, { once: true, capture: true });
+    document.addEventListener('keydown', unmute, { once: true, capture: true });
+  }
+
   /* ------------------------------------------------------------------ arranque */
   initSpotMap();
   initSatMap();
+  initMusic();
   applyLang();
   { const h = (new URLSearchParams(location.search).get("tab") || location.hash.slice(1)); if (["surf", "weather", "cams"].includes(h)) showTab(h); }
   selectSpot(SPOTS[0]);
