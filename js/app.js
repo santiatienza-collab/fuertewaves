@@ -312,7 +312,7 @@ const ICON_EXPAND = '<svg viewBox="0 0 24 24" width="20" height="20" fill="none"
 
   function renderPanel() {
     const s = state.spot;
-    $('#spothead').innerHTML = '<div class="spot-head"><div><h3>' + esc(s.name) + '</h3><div class="zone">' + zoneLabel(s.zone) + '</div></div></div>';
+    $('#spothead').innerHTML = '<div class="spot-head"><div><h3><button type="button" class="spot-pick" data-menu aria-haspopup="listbox">' + esc(s.name) + '<svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9l6 6 6-6"/></svg></button></h3><div class="zone">' + zoneLabel(s.zone) + '</div></div></div>';
     const el = $('#tab-surf');
     let html = '';
     if (state.fcErr) html += errHTML(state.fcErr);
@@ -380,6 +380,24 @@ const ICON_EXPAND = '<svg viewBox="0 0 24 24" width="20" height="20" fill="none"
   window.addEventListener('scroll', () => { if (!spyT) spyT = requestAnimationFrame(() => { spyT = 0; spy(); }); }, { passive: true });
   const setBarH = () => document.documentElement.style.setProperty('--barh', $('.bar').offsetHeight + 'px');
   window.addEventListener('resize', () => { setBarH(); showTab(state.tab, true); if (spotMap) spotMap.invalidateSize(); });
+
+  /* desplegable de spots agrupado por islas (al pulsar el nombre del spot) */
+  function closeMenu() { const m = $('#spotmenu'); if (m) m.hidden = true; }
+  function openMenu(btn) {
+    let m = $('#spotmenu');
+    if (!m) { m = document.createElement('div'); m.id = 'spotmenu'; m.setAttribute('role', 'listbox'); document.body.appendChild(m); }
+    if (!m.hidden && m.dataset.open === '1') { m.hidden = true; m.dataset.open = ''; return; }
+    m.innerHTML = Object.keys(ISLANDS).filter((i) => i !== 'Todas').map((isl) => {
+      const list = SPOTS.filter((x) => x.island === isl).sort((a, b) => a.name.localeCompare(b.name));
+      if (!list.length) return '';
+      return '<div class="mi-head">' + isl + ' <span>' + list.length + '</span></div>' + list.map((x) => '<button type="button" role="option" class="mi' + (x.id === state.spot.id ? ' on' : '') + '" data-pick="' + x.id + '">' + esc(x.name) + '</button>').join('');
+    }).join('');
+    const r = btn.getBoundingClientRect(), w = Math.min(360, window.innerWidth - 20);
+    m.style.width = w + 'px'; m.style.left = Math.max(10, Math.min(r.left, window.innerWidth - w - 10)) + 'px';
+    m.style.top = (r.bottom + 6) + 'px'; m.style.maxHeight = Math.max(200, window.innerHeight - r.bottom - 20) + 'px';
+    m.hidden = false; m.dataset.open = '1';
+    const on = m.querySelector('.mi.on'); if (on) m.scrollTop = Math.max(0, on.offsetTop - 80);
+  }
 
   /* selector de spot (movil) */
   function renderSelect() {
@@ -494,7 +512,7 @@ const ICON_EXPAND = '<svg viewBox="0 0 24 24" width="20" height="20" fill="none"
     Object.keys(markers).forEach((id) => { markers[id].setStyle(markerStyle(id === s.id)); if (id === s.id) markers[id].bringToFront(); });
     if (state.island !== s.island) { state.island = s.island; renderIslands(); }
     if (spotMap) spotMap.panTo([s.lat, s.lon]);
-    renderSelect(); renderPanel(); renderCams(); renderWeather();
+    closeMenu(); renderSelect(); renderPanel(); renderCams(); renderWeather();
     const [fc, td] = await Promise.allSettled([getForecast(s), getTides(s)]);
     if (state.spot !== s) return;
     if (fc.status === 'fulfilled') state.fc = fc.value; else state.fcErr = fc.reason;
@@ -516,7 +534,10 @@ const ICON_EXPAND = '<svg viewBox="0 0 24 24" width="20" height="20" fill="none"
     const fr = e.target.closest('[data-play]');
     if (fr) { playCam(fr); return; }
     const b = e.target.closest('button, a');
-    if (!b) return;
+    if (!b) { closeMenu(); return; }
+    if (b.dataset.menu !== undefined) { openMenu(b); return; }
+    if (b.dataset.pick) { closeMenu(); const sp = SPOTS.find((x) => x.id === b.dataset.pick); if (sp) selectSpot(sp); return; }
+    if (!b.closest('#spotmenu')) closeMenu();
     if (b.dataset.tab) { showTab(b.dataset.tab); try { history.replaceState(null, "", "#" + b.dataset.tab); } catch (x) {} }
     else if (b.dataset.lang && isMob() && !b.closest('.lang').classList.contains('open')) { b.closest('.lang').classList.add('open'); }
     else if (b.dataset.lang) { b.closest('.lang').classList.remove('open'); lang = b.dataset.lang; try { localStorage.setItem('fw_lang', lang); } catch (x) {} applyLang(); }
@@ -536,6 +557,7 @@ const ICON_EXPAND = '<svg viewBox="0 0 24 24" width="20" height="20" fill="none"
   });
   document.addEventListener('click', (e) => { if (!e.target.closest('.lang')) $('.lang').classList.remove('open'); });
   document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape') closeMenu();
     const fr = e.target.closest && e.target.closest('[data-play]');
     if (fr && (e.key === 'Enter' || e.key === ' ')) { e.preventDefault(); playCam(fr); }
   });
