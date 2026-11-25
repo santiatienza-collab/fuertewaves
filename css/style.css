@@ -254,3 +254,22 @@ html, body { overflow-x: clip; }
   .hero-card .score .circle { width: 62px; height: 62px; margin: 7px 0 4px; font-size: 28px; }
   .hero-card > div:first-child .lbl { text-align: left; }
 }
+
+/* ampliar mapa y camaras */
+.expand, .camx { position: absolute; z-index: 700; width: 38px; height: 38px; border-radius: 10px; border: 2px solid var(--orange); background: rgba(11,31,58,.92); color: var(--white); font-size: 20px; line-height: 1; cursor: pointer; display: grid; place-items: center; }
+.expand { right: 24px; top: 70px; }
+.islands { right: 70px; }
+.mapcol.full { position: fixed; inset: 0; z-index: 3000; height: 100vh; height: 100dvh; max-height: none; margin: 0; padding: 0; }
+.mapcol.full #spotmap { inset: 0; border-radius: 0; border: 0; box-shadow: none; }
+.mapcol.full .expand { top: 12px; right: 12px; }
+.mapcol.full .islands { top: 12px; right: 60px; left: 12px; }
+.mapcol.full #spotsel { left: 12px; right: 12px; bottom: 22px; }
+.cam { position: relative; }
+.camx { right: 18px; top: 18px; width: 32px; height: 32px; font-size: 16px; }
+.cam.full { position: fixed; inset: 0; z-index: 3000; margin: 0; border-radius: 0; background: #000; padding: 0; display: flex; flex-direction: column; justify-content: center; }
+.cam.full .frame { aspect-ratio: auto; flex: 1; border-radius: 0; }
+.cam.full .camx { top: 12px; right: 12px; width: 38px; height: 38px; }
+.cam.full h3, .cam.full > a { position: absolute; left: 12px; bottom: 10px; z-index: 5; text-shadow: 0 1px 3px #000; }
+.cam.full h3 { bottom: 30px; }
+body.noscroll { overflow: hidden; }
+@media (max-width: 900px) { .expand { right: 18px; top: 62px; } .islands { right: 14px; } .mapcol.full .islands { right: 60px; } }

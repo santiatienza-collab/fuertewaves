@@ -134,32 +134,62 @@
     const d = angDiff(dir, facing);
     return d < 60 ? 'onshore' : d > 120 ? 'offshore' : 'cross';
   }
+  /* marea normalizada (0 baja .. 1 alta) en la hora h, a partir de los 3 dias de marea; null si no hay dato */
+  function tideNorm(time) {
+    const td = state.td;
+    if (!td || !td.times || !td.times.length) return null;
+    const i = td.times.indexOf(time);
+    if (i < 0) return null;
+    const win = td.levels.slice(Math.max(0, i - 12), i + 13).filter(isNum);
+    if (win.length < 6 || !isNum(td.levels[i])) return null;
+    const lo = Math.min(...win), hi = Math.max(...win);
+    return hi - lo < 0.2 ? null : (td.levels[i] - lo) / (hi - lo);
+  }
+  function tideScore(time, pref) {
+    const n = tideNorm(time);
+    if (n === null || !pref || pref === 'all') return 1;
+    const r = { low: [0, 0.3], low_mid: [0, 0.65], mid: [0.25, 0.75], mid_high: [0.35, 1], high: [0.7, 1] }[pref === 'high_only' ? 'high' : pref] || [0, 1];
+    const d = n < r[0] ? r[0] - n : n > r[1] ? n - r[1] : 0;
+    return 1 - 0.6 * lerp01(d, 0, 0.5);
+  }
   function score(h, s) {
-    const size = swellH(h), period = swellP(h);
-    if (!isNum(size) || !isNum(period)) return 1;
-    const sizeScore = size < s.min ? Math.max(0, size / s.min) : size <= s.max ? 1 : Math.max(0.2, s.max / size);
-    const periodScore = 0.3 + 0.7 * lerp01(period, 6, 12);
-    const swellScore = 1 - 0.8 * lerp01(angDiff(swellDir(h), s.swell), 45, 135);
+    // oleaje: se elige entre swell principal y secundario el que mas energia util aporta al spot
+    const comps = [[swellH(h), swellP(h), swellDir(h)], [h.swell2H, h.swell2P, h.swell2Dir]].filter((c) => isNum(c[0]) && isNum(c[1]) && c[0] > 0.2);
+    if (!comps.length) return 1;
+    const align = (dir) => (isNum(dir) ? 1 - 0.85 * lerp01(angDiff(dir, s.swell), 30, 120) : 0.5);
+    let best = null;
+    comps.forEach((c) => {
+      const e = c[0] * c[0] * c[1] * align(c[2]) * (isNum(c[2]) && angDiff(c[2], s.facing) > 105 ? 0.3 : 1);   // swell que llega de espaldas a la costa: casi no entra
+      if (!best || e > best.e) best = { e, h: c[0], p: c[1], d: c[2] };
+    });
+    const size = best.h, period = best.p;
+    // tamano util en el spot: el swell fuera de ventana pierde altura
+    const effSize = size * (0.5 + 0.5 * align(best.d));
+    const sizeScore = effSize < s.min ? Math.max(0, effSize / s.min) : effSize <= s.max ? 1 : Math.max(0.2, s.max / effSize);
+    const periodScore = 0.2 + 0.8 * lerp01(period, 6, 13);
+    const swellScore = align(best.d);
     const windKnown = isNum(h.windKn) && isNum(h.windDir);
-    let windScore = 0.5;
+    let windScore = 0.6;
     if (windKnown) {
+      const kn = h.windKn, ty = windType(h.windDir, kn, s.facing);
       const diff = angDiff(h.windDir, s.wind);
-      const dirScore = 1 - 0.85 * lerp01(diff, 30, 120);
-      const kn = h.windKn;
-      const speed = kn < 6 ? 1 : kn < 12 ? 0.85 : kn < 18 ? 0.6 : kn < 25 ? 0.35 : 0.15;
-      const onshore = (diff > 60 && windType(h.windDir, kn, s.facing) === 'onshore' && kn >= 6) ? 0.7 : 1;
-      windScore = kn < 4 ? 0.95 : dirScore * speed * onshore;
+      const dirScore = 1 - 0.8 * lerp01(diff, 25, 120);
+      // el offshore tolera mas viento; el onshore y el lateral arruinan la ola antes
+      const speed = ty === 'offshore'
+        ? (kn < 15 ? 1 : kn < 22 ? 0.75 : kn < 30 ? 0.45 : 0.2)
+        : ty === 'cross'
+          ? (kn < 8 ? 0.9 : kn < 14 ? 0.6 : kn < 20 ? 0.35 : 0.15)
+          : (kn < 6 ? 0.85 : kn < 10 ? 0.5 : kn < 16 ? 0.3 : 0.12);
+      windScore = kn < 4 ? 0.95 : dirScore * speed;
+      if (isNum(h.gustKn) && h.gustKn - kn > 12) windScore *= 0.85;
     }
     const f = (x) => clamp(x, 0.05, 1);
-    const total = Math.pow(f(sizeScore), 0.35) * Math.pow(f(windScore), 0.25) * Math.pow(f(periodScore), 0.2) * Math.pow(f(swellScore), 0.2);
-    const base = 1 + 9 * Math.pow(total, 1.6);
-    // bonus: swell y viento alineados suben la nota; con mas de 1 m, sube mas. Desfasados: sin bonus.
-    const aligned = windKnown ? Math.min(swellScore, windScore) : 0;
-    let bonus = 0;
-    if (aligned >= 0.6) {
-      bonus += 2 * aligned;
-      if (size >= 1) bonus += Math.min(2, 0.5 + 1.5 * (size - 1)) * aligned;
-    }
+    const tide = tideScore(h.time, s.tide);
+    const total = Math.pow(f(sizeScore), 0.3) * Math.pow(f(windScore), 0.28) * Math.pow(f(periodScore), 0.2) * Math.pow(f(swellScore), 0.2) * Math.pow(f(tide), 0.12);
+    const base = 1 + 9 * Math.pow(total, 1.5);
+    // bonus: condiciones realmente alineadas (swell + viento + tamano util)
+    const aligned = windKnown ? Math.min(swellScore, windScore, f(sizeScore)) : 0;
+    const bonus = aligned >= 0.65 ? 1.5 * aligned + (effSize >= 1 ? Math.min(1.5, 0.5 * effSize) * aligned : 0) : 0;
     return clamp(Math.floor(base + bonus), 1, 10);
   }
   const scoreColor = (s) => (s <= 3 ? '#EF9A9A' : s <= 6 ? '#FFE082' : '#A5D6A7');
@@ -354,7 +384,7 @@
       const frame = c.media
         ? '<div class="frame" data-play="' + esc(c.media) + '" data-title="' + esc(c.name) + '" style="background-image:url(' + c.img + ')" role="button" tabindex="0" aria-label="' + esc(c.name) + '"><span class="play"><i></i></span><span class="tag">' + km.toFixed(0) + ' km</span></div>'
         : '<a class="frame" href="' + page + '" target="_blank" rel="noopener" style="display:block;background-image:url(' + c.img + ')"><span class="nostream">' + t('cams_site_only') + '</span><span class="tag">' + km.toFixed(0) + ' km</span></a>';
-      return '<article class="card cam' + (i < 2 ? ' near' : '') + '">' + frame + '<h3>' + (i === 0 ? '★ ' : '') + esc(c.name) + '</h3><a href="' + page + '" target="_blank" rel="noopener">' + t('cams_open') + '</a></article>';
+      return '<article class="card cam' + (i < 2 ? ' near' : '') + '">' + frame + '<button type="button" class="camx" data-full aria-label="Fullscreen">⤢</button>' + '<h3>' + (i === 0 ? '★ ' : '') + esc(c.name) + '</h3><a href="' + page + '" target="_blank" rel="noopener">' + t('cams_open') + '</a></article>';
     }).join('');
   }
 
@@ -371,6 +401,18 @@
   function initSpotMap() {
     spotMap = L.map('spotmap', { zoomControl: true, zoomSnap: 0.25 }).setView(ISLANDS['Fuerteventura'].c, ISLANDS['Fuerteventura'].z);
     L.tileLayer(ESRI, { maxZoom: 18, attribution: 'Tiles © Esri' }).addTo(spotMap);
+    const mc = $('.mapcol'), eb = document.createElement('button');
+    eb.className = 'expand'; eb.type = 'button'; eb.setAttribute('aria-label', 'Expand map'); eb.textContent = '⤢';
+    mc.appendChild(eb);
+    const mobile = () => window.matchMedia('(max-width: 900px)').matches;
+    const interactive = (on) => ['dragging', 'touchZoom', 'doubleClickZoom', 'scrollWheelZoom'].forEach((k) => spotMap[k][on || !mobile() ? 'enable' : 'disable']());
+    interactive(false);
+    eb.addEventListener('click', () => {
+      const full = mc.classList.toggle('full');
+      document.body.classList.toggle('noscroll', full);
+      eb.textContent = full ? '✕' : '⤢';
+      interactive(full); setTimeout(() => spotMap.invalidateSize(), 60);
+    });
     SPOTS.forEach((s) => {
       const m = L.circleMarker([s.lat, s.lon], markerStyle(s.id === state.spot.id)).addTo(spotMap);
       m.bindTooltip(s.name);
@@ -427,6 +469,8 @@
   }
 
   document.addEventListener('click', (e) => {
+    const xb = e.target.closest('[data-full]');
+    if (xb) { const c = xb.closest('.cam'), on = c.classList.toggle('full'); document.body.classList.toggle('noscroll', on); xb.textContent = on ? '✕' : '⤢'; const fr = c.querySelector('[data-play]'); if (on && fr) playCam(fr); return; }
     const fr = e.target.closest('[data-play]');
     if (fr) { playCam(fr); return; }
     const b = e.target.closest('button, a');
