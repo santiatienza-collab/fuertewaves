@@ -273,3 +273,23 @@ html, body { overflow-x: clip; }
 .cam.full h3 { bottom: 30px; }
 body.noscroll { overflow: hidden; }
 @media (max-width: 900px) { .expand { right: 18px; top: 62px; } .islands { right: 14px; } .mapcol.full .islands { right: 60px; } }
+
+.score .lbl { display: none; }
+/* ---- MOVIL v3: mapa en todas las pestanas; esferas en filas legibles ---- */
+@media (max-width: 900px) {
+  body:not(.tab-surf) .mapcol { display: block; order: 1; height: 38vh; height: 38svh; min-height: 240px; margin-top: 12px; }
+  body:not(.tab-surf) #spothead { order: 0; }
+  body:not(.tab-surf) .tabpane { order: 2; }
+  .hero-card { display: block; }
+  .hero-card > div:first-child { display: block; padding-bottom: 12px; border-bottom: 1px solid var(--line); }
+  .hero-card > div:first-child .lbl { text-align: left; }
+  .hero-card .dial, .hero-card .score { display: grid; grid-template-columns: 84px minmax(0, 1fr); grid-template-areas: "svg lbl" "svg v" "svg s"; align-items: center; column-gap: 16px; row-gap: 2px; text-align: left; padding: 12px 0; border-bottom: 1px solid var(--line); }
+  .hero-card .dial svg { grid-area: svg; width: 84px; height: 84px; margin: 0; }
+  .hero-card .dial .lbl, .hero-card .score .lbl { display: block; grid-area: lbl; height: auto; line-height: 1.2; text-align: left; margin: 0; font-size: 11px; }
+  .hero-card .dial .v { grid-area: v; font-size: 17px; }
+  .hero-card .dial .s { grid-area: s; font-size: 12px; min-height: 0; }
+  .hero-card .score { grid-template-areas: "c lbl" "c w"; padding: 12px 0; }
+  .hero-card .score .circle { grid-area: c; width: 64px; height: 64px; margin: 0 10px; font-size: 28px; justify-self: center; }
+  .hero-card .score .word { grid-area: w; font-size: 15px; align-self: start; }
+  .hero-card .legend { padding-top: 10px; }
+}

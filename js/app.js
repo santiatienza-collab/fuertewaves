@@ -234,7 +234,7 @@
       '<div class="kv">' + fmt(swellP(h), 0, ' s') + '</div><div class="kv m">' + fmt(energyKj(h), 0) + ' kJ</div></div>' +
       dial('lbl_swell', swellDir(h), spot.swell, fmt(swellH(h), 1, 'm') + ' ' + compass(swellDir(h)), isNum(h.swell2H) ? '2: ' + fmt(h.swell2H, 1, 'm') + ' ' + fmt(h.swell2P, 0, 's') : '') +
       dial('lbl_wind', h.windDir, spot.wind, known ? fmt(h.windKn, 0) + ' kn ' + compass(h.windDir) : '-', known ? t('lbl_gust') + ' ' + fmt(h.gustKn, 0) + ' · <span style="color:' + windColor(ty) + '">' + t('wind_' + ty) + '</span>' : '') +
-      '<div class="score"><div class="circle" style="background:' + scoreColor(sc) + '">' + sc + '</div><div class="word" style="color:' + scoreColor(sc) + '">' + t(ratingKey(sc)) + '</div></div>' +
+      '<div class="score"><div class="lbl">' + ({ es: 'Puntuación', en: 'Score', fr: 'Note', de: 'Wertung' }[lang] || 'Score') + '</div><div class="circle" style="background:' + scoreColor(sc) + '">' + sc + '</div><div class="word" style="color:' + scoreColor(sc) + '">' + t(ratingKey(sc)) + '</div></div>' +
       '<div class="legend"><i></i>' + t('dial_legend') + '</div></div>';
   }
 
