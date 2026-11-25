@@ -199,62 +199,8 @@ html, body { overflow-x: clip; }
 .islands .chip { pointer-events: auto; padding: 5px 10px; font-size: 11px; background: rgba(11,31,58,.88); backdrop-filter: blur(4px); }
 .islands .chip.on { background: var(--orange); }
 .leaflet-top.leaflet-left { top: 4px; }
-@media (max-width: 900px) {
-  .layout { display: block; height: auto; }
-  .mapcol { position: relative; top: auto; height: 50vh; height: 50svh; min-height: 300px; max-height: 460px; z-index: 1; }
-  .islands { left: 56px; right: 14px; top: 14px; }
-  .panel { overflow: visible; padding: 14px 12px 28px; }
-  .bar { height: auto; }
-  .spot-head h3 { font-size: 15px; overflow-wrap: anywhere; }
-  .hero-card { grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px; }
-  .hero-card > div:first-child { grid-column: 1 / -1; display: flex; align-items: baseline; gap: 14px; flex-wrap: wrap; }
-  .hero-card .score { padding-top: 0; }
-  .hero-card .lbl { min-height: 0; }
-  .hero-card .dial svg { width: 70px; height: 70px; }
-  .hero-card .score .circle { width: 58px; height: 58px; }
-  .big { font-size: 30px; }
-  .cams { grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); }
-  #spotsel { font-size: 16px; }
-}
 .islands { pointer-events: auto; overflow-x: auto; flex-wrap: nowrap; scrollbar-width: none; }
 .islands::-webkit-scrollbar { display: none; }
-@media (max-width: 900px) { .hero-card > div:first-child { display: block; } }
-
-/* ---- MOVIL v2: datos arriba, mapa debajo; Ficha, Tiempo y Webcams en paginas aparte ---- */
-@media (min-width: 901px) { .tabs .tab-ficha { display: none; } }
-@media (max-width: 900px) {
-  .desk-only { display: none; }
-  .layout { display: flex; flex-direction: column; padding: 0 12px 24px; }
-  .panel { display: contents; }
-  #spothead { order: 1; padding-top: 14px; }
-  .tabpane { order: 2; margin-top: 14px; }
-  .mapcol { order: 3; margin: 16px -12px 0; height: 56vh; height: 56svh; min-height: 320px; max-height: 480px; }
-  .foot { order: 4; margin-top: 20px; }
-  body:not(.tab-surf) .mapcol { display: none; }
-  .tabs { gap: 4px; }
-  .tabs button { padding: 8px 2px; font-size: 10.5px; letter-spacing: .03em; }
-
-  /* esferas: tres columnas identicas */
-  .hero-card { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 12px 6px; align-items: start; }
-  .hero-card > div:first-child { grid-column: 1 / -1; display: flex; flex-wrap: wrap; align-items: baseline; gap: 4px 14px; }
-  .hero-card > div:first-child .lbl { flex-basis: 100%; }
-  .hero-card .big { font-size: 34px; }
-  .hero-card .dial, .hero-card .score { display: flex; flex-direction: column; align-items: center; padding: 0; text-align: center; }
-  .hero-card .lbl { min-height: 0; height: 14px; line-height: 14px; margin: 0 0 4px; text-align: center; }
-  .hero-card .dial svg { width: 76px; height: 76px; margin: 0 0 4px; }
-  .hero-card .score { padding-top: 18px; }
-  .hero-card .score .circle { width: 76px; height: 76px; margin: 0 0 4px; font-size: 30px; }
-  .hero-card .dial .v { font-size: 13px; }
-  .hero-card .dial .s { font-size: 10px; min-height: 26px; }
-  .hero-card .score .word { font-size: 11px; }
-  .legend { grid-column: 1 / -1; }
-}
-
-@media (max-width: 900px) {
-  .hero-card .score .circle { width: 62px; height: 62px; margin: 7px 0 4px; font-size: 28px; }
-  .hero-card > div:first-child .lbl { text-align: left; }
-}
-
 /* ampliar mapa y camaras */
 .expand, .camx { position: absolute; z-index: 700; width: 38px; height: 38px; border-radius: 10px; border: 2px solid var(--orange); background: rgba(11,31,58,.92); color: var(--white); font-size: 20px; line-height: 1; cursor: pointer; display: grid; place-items: center; }
 .expand { right: 24px; top: 70px; }
@@ -272,49 +218,69 @@ html, body { overflow-x: clip; }
 .cam.full h3, .cam.full > a { position: absolute; left: 12px; bottom: 10px; z-index: 5; text-shadow: 0 1px 3px #000; }
 .cam.full h3 { bottom: 30px; }
 body.noscroll { overflow: hidden; }
-@media (max-width: 900px) { .expand { right: 18px; top: 62px; } .islands { right: 14px; } .mapcol.full .islands { right: 60px; } }
 
 .score .lbl { display: none; }
-/* ---- MOVIL v3: mapa en todas las pestanas; esferas en filas legibles ---- */
-@media (max-width: 900px) {
-  body:not(.tab-surf) .mapcol { display: block; order: 1; height: 38vh; height: 38svh; min-height: 240px; margin-top: 12px; }
-  body:not(.tab-surf) #spothead { order: 0; }
-  body:not(.tab-surf) .tabpane { order: 2; }
-  .hero-card { display: block; }
-  .hero-card > div:first-child { display: block; padding-bottom: 12px; border-bottom: 1px solid var(--line); }
-  .hero-card > div:first-child .lbl { text-align: left; }
-  .hero-card .dial, .hero-card .score { display: grid; grid-template-columns: 84px minmax(0, 1fr); grid-template-areas: "svg lbl" "svg v" "svg s"; align-items: center; column-gap: 16px; row-gap: 2px; text-align: left; padding: 12px 0; border-bottom: 1px solid var(--line); }
-  .hero-card .dial svg { grid-area: svg; width: 84px; height: 84px; margin: 0; }
-  .hero-card .dial .lbl, .hero-card .score .lbl { display: block; grid-area: lbl; height: auto; line-height: 1.2; text-align: left; margin: 0; font-size: 11px; }
-  .hero-card .dial .v { grid-area: v; font-size: 17px; }
-  .hero-card .dial .s { grid-area: s; font-size: 12px; min-height: 0; }
-  .hero-card .score { grid-template-areas: "c lbl" "c w"; padding: 12px 0; }
-  .hero-card .score .circle { grid-area: c; width: 64px; height: 64px; margin: 0 10px; font-size: 28px; justify-self: center; }
-  .hero-card .score .word { grid-area: w; font-size: 15px; align-self: start; }
-  .hero-card .legend { padding-top: 10px; }
-}
+.sectitle { display: none; }
+.sections { display: none; }
 
-/* ---- MOVIL v4: Surfspots = datos compactos, mapa, prevision, mareas ---- */
+/* MOVIL: una sola pagina como la app Android. Barra fija (marca + banderas + secciones);
+   datos -> mapa -> prevision -> mareas -> webcams -> tiempo -> info */
 @media (max-width: 900px) {
-  body.tab-surf #tab-surf { display: contents; }
-  body.tab-surf #tab-surf > .card, body.tab-surf #tab-surf > .err { order: 2; margin-top: 10px; }
-  body.tab-surf .mapcol { order: 3; margin-top: 14px; height: 44vh; height: 44svh; min-height: 260px; max-height: 420px; }
-  body.tab-surf .panel-hours { order: 4; margin-top: 14px; }
-  body.tab-surf .tides-wrap { order: 5; margin-top: 14px; }
-  .foot { order: 9; }
+  html { scroll-behavior: smooth; }
+  body.mob .tabs { display: none; }
+  body.mob .bar { position: sticky; top: 0; height: auto; flex-wrap: wrap; align-items: center; gap: 6px 10px; padding: 8px 14px 0; }
+  body.mob .brand span { display: inline; font-size: 13px; letter-spacing: .03em; }
+  body.mob .lang { gap: 4px; flex: none; }
+  body.mob .brand { flex: 1; min-width: 0; }
+  body.mob .lang { margin-left: auto; }
+  body.mob .lang button { width: 28px; height: 20px; }
+  body.mob .sections { order: 3; width: 100%; display: flex; gap: 8px; overflow-x: auto; padding: 6px 0 10px; scrollbar-width: none; -webkit-overflow-scrolling: touch; }
+  body.mob .sections::-webkit-scrollbar { display: none; }
+  body.mob .sections button { flex: none; background: transparent; color: var(--white); border: 1px solid var(--line); border-radius: 999px; padding: 7px 14px; font: 700 11px var(--display); text-transform: uppercase; letter-spacing: .06em; cursor: pointer; white-space: nowrap; touch-action: manipulation; }
+  body.mob .sections button.on { background: var(--orange); border-color: var(--orange); color: var(--navy); }
 
-  /* datos del spot, compactos: una linea con la ola y tres casillas iguales */
-  .hero-card { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 6px; padding: 10px; }
-  .hero-card > div:first-child { grid-column: 1 / -1; display: flex; flex-wrap: wrap; align-items: baseline; gap: 2px 12px; padding: 0 0 8px; border-bottom: 1px solid var(--line); }
-  .hero-card > div:first-child .lbl { flex-basis: auto; }
-  .hero-card .big { font-size: 28px; }
-  .hero-card .kv { font-size: 14px; }
-  .hero-card .dial, .hero-card .score { display: flex; flex-direction: column; align-items: center; text-align: center; padding: 4px 0 0; border: 0; gap: 0; }
-  .hero-card .dial .lbl, .hero-card .score .lbl { display: block; height: auto; font-size: 10px; text-align: center; margin: 0 0 2px; }
-  .hero-card .dial svg { width: 58px; height: 58px; margin: 0; }
-  .hero-card .score .circle { width: 46px; height: 46px; margin: 6px 0 4px; font-size: 22px; }
-  .hero-card .dial .v { font-size: 12px; margin-top: 2px; }
-  .hero-card .dial .s { font-size: 9.5px; min-height: 0; line-height: 1.25; }
-  .hero-card .score .word { font-size: 11px; }
-  .hero-card .legend { grid-column: 1 / -1; margin-top: 4px; font-size: 10px; padding: 0; }
+  body.mob .layout { display: flex; flex-direction: column; height: auto; padding: 0 14px 28px; }
+  body.mob .panel { display: contents; }
+  body.mob .tabpane[hidden] { display: block !important; }
+  body.mob #tab-surf { display: contents; }
+  body.mob .desk-only { display: none; }
+
+  body.mob #spothead { order: 1; padding-top: 14px; }
+  body.mob #tab-surf > .card, body.mob #tab-surf > .err { order: 2; margin-top: 12px; }
+  body.mob .mapcol { order: 3; position: relative; top: auto; z-index: 1; height: 300px; min-height: 0; max-height: none; margin: 16px 0 0; padding: 0; background: none; }
+  body.mob #spotmap { inset: 0; border-radius: 16px; border: 2px solid var(--orange); box-shadow: none; }
+  body.mob .panel-hours { order: 4; margin-top: 18px; }
+  body.mob .tides-wrap { order: 5; margin-top: 18px; }
+  body.mob #tab-cams { order: 6; margin-top: 18px; }
+  body.mob #tab-weather { order: 7; margin-top: 18px; }
+  body.mob #tab-ficha { order: 8; margin-top: 18px; }
+  body.mob .foot { order: 9; margin-top: 22px; }
+  body.mob .sectitle { display: block; font-size: 15px; color: var(--orange); margin: 0 0 8px; }
+  body.mob .tabpane > * + * { margin-top: 12px; }
+
+  body.mob .islands { left: 56px; right: 10px; top: 10px; }
+  body.mob .expand { right: 10px; top: 58px; }
+  body.mob #spotsel { left: 10px; right: 10px; bottom: 10px; font-size: 15px; }
+  body.mob .mapcol.full { position: fixed; inset: 0; z-index: 3000; height: 100vh; height: 100dvh; margin: 0; }
+  body.mob .mapcol.full #spotmap { border-radius: 0; border: 0; }
+  body.mob .mapcol.full .expand { top: 58px; }
+
+  body.mob .spot-head h3 { font-size: 17px; overflow-wrap: anywhere; }
+  body.mob .hero-card { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px 6px; padding: 12px 10px; }
+  body.mob .hero-card > div:first-child { grid-column: 1 / -1; display: flex; flex-wrap: wrap; align-items: baseline; gap: 2px 12px; padding: 0 0 10px; border-bottom: 1px solid var(--line); }
+  body.mob .hero-card > div:first-child .lbl { flex-basis: 100%; min-height: 0; text-align: left; }
+  body.mob .hero-card .big { font-size: 32px; }
+  body.mob .hero-card .kv { font-size: 14px; }
+  body.mob .hero-card .dial, body.mob .hero-card .score { display: flex; flex-direction: column; align-items: center; justify-content: flex-start; text-align: center; padding: 0; margin: 0; border: 0; }
+  body.mob .hero-card .dial .lbl, body.mob .hero-card .score .lbl { display: block; height: 14px; min-height: 0; line-height: 14px; margin: 0 0 4px; padding: 0; font-size: 10px; text-align: center; white-space: nowrap; }
+  body.mob .hero-card .dial svg { width: 62px; height: 62px; margin: 0 0 4px; }
+  body.mob .hero-card .score .circle { width: 62px; height: 62px; margin: 0 0 4px; font-size: 26px; }
+  body.mob .hero-card .dial .v, body.mob .hero-card .score .word { font-size: 12.5px; font-weight: 800; line-height: 1.2; text-align: center; width: 100%; }
+  body.mob .hero-card .dial .s { font-size: 10px; line-height: 1.25; min-height: 0; text-align: center; }
+  body.mob .hero-card .legend { grid-column: 1 / -1; margin-top: 2px; font-size: 10.5px; padding: 0; }
+
+  body.mob .cams { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; }
+  body.mob .cam { padding: 8px; }
+  body.mob #satmap { height: 300px; }
+  body.mob .weather-grid { grid-template-columns: minmax(0, 1fr); }
 }

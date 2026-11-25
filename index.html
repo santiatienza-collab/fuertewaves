@@ -19,6 +19,7 @@
       <button role="tab" data-tab="weather" data-i18n="nav_weather">Weather</button>
       <button role="tab" data-tab="cams" data-i18n="nav_webcams">Webcams</button>
     </nav>
+    <nav class="sections" id="sections" aria-label="Sections"></nav>
     <div class="lang" role="group" aria-label="Language">
       <button data-lang="en" title="English" aria-label="English"><img src="assets/flags/en.svg" alt="EN"></button>
       <button data-lang="es" title="Español" aria-label="Español"><img src="assets/flags/es.svg" alt="ES"></button>
@@ -42,6 +43,7 @@
       <div class="tabpane" id="tab-ficha" hidden></div>
 
       <div class="tabpane" id="tab-weather" hidden>
+        <h3 class="sectitle" data-i18n="nav_weather"></h3>
         <div id="wx"></div>
         <div class="chips" id="satchips"></div>
         <div id="satmap" aria-label="Satellite"></div>
@@ -49,6 +51,7 @@
       </div>
 
       <div class="tabpane" id="tab-cams" hidden>
+        <h3 class="sectitle" data-i18n="nav_webcams"></h3>
         <p class="sub" data-i18n="sec_cams_sub"></p>
         <div class="cams" id="cams"></div>
       </div>

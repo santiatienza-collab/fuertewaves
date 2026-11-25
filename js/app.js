@@ -319,15 +319,23 @@ const ICON_EXPAND = '<svg viewBox="0 0 24 24" width="20" height="20" fill="none"
     else if (!state.fc) html += '<div class="card loading">' + t('loading') + '</div>';
     else {
       const hours = state.fc.filter((h) => h.time >= nowHour());
-      if (hours.length) html += '<div class="card">' + heroHTML(hours[0], s) + '</div>' + '<div class="panel-hours">' + hoursHTML(s, hours, state.dayIdx) + '</div>';
+      if (hours.length) html += '<div class="card" id="sec-now">' + heroHTML(hours[0], s) + '</div>' + '<div class="panel-hours" id="sec-forecast">' + hoursHTML(s, hours, state.dayIdx) + '</div>';
     }
-    html += '<div class="tides-wrap">' + tidesHTML(state.td) + '</div><div class="desk-only">' + infoHTML(s) + '</div>';
+    html += '<div class="tides-wrap" id="sec-tides">' + tidesHTML(state.td) + '</div><div class="desk-only">' + infoHTML(s) + '</div>';
     el.innerHTML = html;
     $('#tab-ficha').innerHTML = infoHTML(s);
   }
 
   /* pestanas */
-  function showTab(name) {
+  const isMob = () => window.matchMedia('(max-width: 900px)').matches;
+  function showTab(name, initial) {
+    if (isMob()) {
+      document.body.classList.add('mob'); document.body.classList.remove('tab-surf', 'tab-weather', 'tab-cams', 'tab-ficha');
+      ['surf', 'weather', 'cams', 'ficha'].forEach((n) => { $('#tab-' + n).hidden = false; });
+      if (!initial) goSec({ surf: 'sec-now', weather: 'tab-weather', cams: 'tab-cams', ficha: 'tab-ficha' }[name]);
+      return;
+    }
+    document.body.classList.remove('mob');
     state.tab = name;
     $$('.tabs button').forEach((b) => { const on = b.dataset.tab === name; b.classList.toggle('on', on); b.setAttribute('aria-selected', on ? 'true' : 'false'); });
     if (name === 'ficha' && window.matchMedia('(min-width: 901px)').matches) name = 'surf';
@@ -339,6 +347,36 @@ const ICON_EXPAND = '<svg viewBox="0 0 24 24" width="20" height="20" fill="none"
     $('#panel').scrollTop = 0;
     window.scrollTo(0, 0);
   }
+
+  /* movil: barra de secciones (como la app) con resaltado al desplazar */
+  const SEC_IDS = ['sec-now', 'sec-forecast', 'sec-tides', 'tab-cams', 'tab-weather', 'tab-ficha'];
+  const SEC_LBL = {
+    es: ['Ahora', 'Previsión', 'Mareas', 'Webcams', 'Tiempo', 'Info'], en: ['Now', 'Forecast', 'Tides', 'Webcams', 'Weather', 'Info'],
+    fr: ['Maintenant', 'Prévision', 'Marées', 'Webcams', 'Météo', 'Infos'], de: ['Jetzt', 'Vorhersage', 'Gezeiten', 'Webcams', 'Wetter', 'Infos'],
+  };
+  let secOn = 0;
+  function renderSections() {
+    const lbl = SEC_LBL[lang] || SEC_LBL.en;
+    $('#sections').innerHTML = SEC_IDS.map((id, i) => '<button type="button" data-sec="' + id + '" class="' + (i === secOn ? 'on' : '') + '">' + lbl[i] + '</button>').join('');
+  }
+  function goSec(id) {
+    const el = document.getElementById(id) || $('#spothead');
+    const y = el.getBoundingClientRect().top + window.scrollY - $('.bar').offsetHeight - 8;
+    window.scrollTo({ top: Math.max(0, y), behavior: 'smooth' });
+  }
+  function spy() {
+    if (!isMob()) return;
+    const hb = $('.bar').offsetHeight + 24;
+    let idx = 0;
+    SEC_IDS.forEach((id, i) => { const el = document.getElementById(id); if (el && el.getBoundingClientRect().top <= hb) idx = i; });
+    if (window.innerHeight + window.scrollY >= document.documentElement.scrollHeight - 6) idx = SEC_IDS.length - 1;
+    if (idx === secOn) return;
+    secOn = idx;
+    $$('#sections button').forEach((b, i) => { b.classList.toggle('on', i === idx); if (i === idx) b.scrollIntoView({ block: 'nearest', inline: 'center' }); });
+  }
+  let spyT = 0;
+  window.addEventListener('scroll', () => { if (!spyT) spyT = requestAnimationFrame(() => { spyT = 0; spy(); }); }, { passive: true });
+  window.addEventListener('resize', () => { showTab(state.tab, true); if (spotMap) spotMap.invalidateSize(); });
 
   /* selector de spot (movil) */
   function renderSelect() {
@@ -465,7 +503,7 @@ const ICON_EXPAND = '<svg viewBox="0 0 24 24" width="20" height="20" fill="none"
     document.documentElement.lang = lang;
     $$('[data-i18n]').forEach((el) => { el.textContent = t(el.dataset.i18n); });
     $$('.lang button').forEach((b) => b.classList.toggle('on', b.dataset.lang === lang));
-    document.title = 'FuerteWaves · Canarias surf forecast'; renderIslands();
+    document.title = 'FuerteWaves · Canarias surf forecast'; renderIslands(); renderSections();
     renderPanel(); renderCams(); renderWeather(); renderSatChips();
   }
 
@@ -480,6 +518,7 @@ const ICON_EXPAND = '<svg viewBox="0 0 24 24" width="20" height="20" fill="none"
     else if (b.dataset.lang) { lang = b.dataset.lang; try { localStorage.setItem('fw_lang', lang); } catch (x) {} applyLang(); }
     else if (b.dataset.day !== undefined) { state.dayIdx = +b.dataset.day; renderPanel(); }
     else if (b.dataset.muni) { state.muni = MUNIS.concat(MUNIS_EXTRA).find((m) => m.name === b.dataset.muni); renderWeather(); }
+    else if (b.dataset.sec) { secOn = SEC_IDS.indexOf(b.dataset.sec); $$('#sections button').forEach((x, i) => x.classList.toggle('on', i === secOn)); goSec(b.dataset.sec); }
     else if (b.dataset.island) { state.island = b.dataset.island; renderIslands(); const v = ISLANDS[state.island]; spotMap.flyTo(v.c, v.z, { duration: 0.6 }); }
     else if (b.dataset.sat) { setSat(b.dataset.sat); }
     else if (b.dataset.retry !== undefined) {
@@ -503,5 +542,6 @@ const ICON_EXPAND = '<svg viewBox="0 0 24 24" width="20" height="20" fill="none"
   { const h = (new URLSearchParams(location.search).get("tab") || location.hash.slice(1)); if (["surf", "weather", "cams", "ficha"].includes(h)) showTab(h); }
   showTab(['surf', 'weather', 'cams', 'ficha'].includes(location.hash.slice(1)) ? location.hash.slice(1) : 'surf');
   selectSpot(SPOTS[0]);
+  showTab(state.tab, true);
   window.addEventListener('load', () => { spotMap.invalidateSize(); satMap.invalidateSize(); });
 })();
