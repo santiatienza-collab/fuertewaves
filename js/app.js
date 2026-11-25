@@ -374,7 +374,7 @@ const ICON_EXPAND = '<svg viewBox="0 0 24 24" width="20" height="20" fill="none"
     if (window.innerHeight + window.scrollY >= document.documentElement.scrollHeight - 6) idx = SEC_IDS.length - 1;
     if (idx === secOn) return;
     secOn = idx;
-    $$('#sections button').forEach((b, i) => { b.classList.toggle('on', i === idx); if (i === idx) b.scrollIntoView({ block: 'nearest', inline: 'center' }); });
+    $$('#sections button').forEach((b, i) => { b.classList.toggle('on', i === idx); if (i === idx) { const n = $('#sections'); n.scrollTo({ left: b.offsetLeft - (n.clientWidth - b.offsetWidth) / 2, behavior: 'auto' }); } });
   }
   let spyT = 0;
   window.addEventListener('scroll', () => { if (!spyT) spyT = requestAnimationFrame(() => { spyT = 0; spy(); }); }, { passive: true });

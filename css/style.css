@@ -344,3 +344,10 @@ body.noscroll { overflow: hidden; }
   body.mob .lang { left: auto; right: 6px; top: calc(var(--barh, 46px) + 6px); }
   body.mob #spothead { padding-left: 0; padding-right: 54px; }
 }
+
+/* movil: los mapas no atrapan el scroll vertical de la pagina (salvo el mapa ampliado) */
+@media (max-width: 900px) {
+  body.mob .leaflet-container { touch-action: pan-y !important; }
+  body.mob .mapcol.full .leaflet-container { touch-action: none !important; }
+  html { scroll-behavior: auto; }
+}
