@@ -290,18 +290,23 @@
       const hours = state.fc.filter((h) => h.time >= nowHour());
       if (hours.length) html += '<div class="card">' + heroHTML(hours[0], s) + '</div>' + '<div class="panel-hours">' + hoursHTML(s, hours, state.dayIdx) + '</div>';
     }
-    html += '<div>' + tidesHTML(state.td) + '</div>' + infoHTML(s);
+    html += '<div>' + tidesHTML(state.td) + '</div><div class="desk-only">' + infoHTML(s) + '</div>';
     el.innerHTML = html;
+    $('#tab-ficha').innerHTML = infoHTML(s);
   }
 
   /* pestanas */
   function showTab(name) {
     state.tab = name;
     $$('.tabs button').forEach((b) => { const on = b.dataset.tab === name; b.classList.toggle('on', on); b.setAttribute('aria-selected', on ? 'true' : 'false'); });
-    ['surf', 'weather', 'cams'].forEach((n) => { $('#tab-' + n).hidden = n !== name; });
+    if (name === 'ficha' && window.matchMedia('(min-width: 901px)').matches) name = 'surf';
+    state.tab = name; document.body.className = 'tab-' + name;
+    $$('.tabs button').forEach((b) => { const on = b.dataset.tab === name; b.classList.toggle('on', on); b.setAttribute('aria-selected', on ? 'true' : 'false'); });
+    ['surf', 'weather', 'cams', 'ficha'].forEach((n) => { $('#tab-' + n).hidden = n !== name; });
+    if (name === 'surf' && spotMap) setTimeout(() => spotMap.invalidateSize(), 50);
     if (name === 'weather' && satMap) setTimeout(() => satMap.invalidateSize(), 50);
     $('#panel').scrollTop = 0;
-    if (window.matchMedia('(max-width: 900px)').matches && name !== 'surf') { const m = $('.mapcol'); window.scrollTo({ top: m.offsetTop + m.offsetHeight - 56, behavior: 'smooth' }); }
+    window.scrollTo(0, 0);
   }
 
   /* selector de spot (movil) */
@@ -450,8 +455,8 @@
   initSpotMap();
   initSatMap();
   applyLang();
-  { const h = (new URLSearchParams(location.search).get("tab") || location.hash.slice(1)); if (["surf", "weather", "cams"].includes(h)) showTab(h); }
-  showTab(['surf', 'weather', 'cams'].includes(location.hash.slice(1)) ? location.hash.slice(1) : 'surf');
+  { const h = (new URLSearchParams(location.search).get("tab") || location.hash.slice(1)); if (["surf", "weather", "cams", "ficha"].includes(h)) showTab(h); }
+  showTab(['surf', 'weather', 'cams', 'ficha'].includes(location.hash.slice(1)) ? location.hash.slice(1) : 'surf');
   selectSpot(SPOTS[0]);
   window.addEventListener('load', () => { spotMap.invalidateSize(); satMap.invalidateSize(); });
 })();

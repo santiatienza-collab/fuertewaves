@@ -1,7 +1,7 @@
 /* Traducciones: EN / ES / FR / DE */
 const I18N = {
   en: {
-    nav_home: 'Home', nav_surf: 'Surf spots', nav_weather: 'Weather', nav_webcams: 'Webcams',
+    nav_ficha: 'Info', nav_home: 'Home', nav_surf: 'Surf spots', nav_weather: 'Weather', nav_webcams: 'Webcams',
     hero_kicker: 'Fuerteventura', hero_title: 'Surf forecast for Fuerteventura',
     hero_sub: 'Waves, swell, wind and weather in detail to choose your spot. NOAA wave model, ECMWF wind and weather, live webcams and satellite.',
     cta_surf: 'Explore surf spots', cta_cams: 'Live webcams', now_at: 'Right now at %1',
@@ -37,7 +37,7 @@ const I18N = {
     best_today: 'Best spot today', unit_m: 'm',
   },
   es: {
-    nav_home: 'Inicio', nav_surf: 'Surfspots', nav_weather: 'Tiempo', nav_webcams: 'Webcams',
+    nav_ficha: 'Ficha', nav_home: 'Inicio', nav_surf: 'Surfspots', nav_weather: 'Tiempo', nav_webcams: 'Webcams',
     hero_kicker: 'Fuerteventura', hero_title: 'Previsión de surf en Fuerteventura',
     hero_sub: 'Oleaje, swell, viento y tiempo al detalle para elegir tu spot. Modelo de oleaje NOAA, viento y tiempo ECMWF, webcams en directo y satélite.',
     cta_surf: 'Explorar surfspots', cta_cams: 'Webcams en directo', now_at: 'Ahora mismo en %1',
@@ -73,7 +73,7 @@ const I18N = {
     best_today: 'Mejor spot hoy', unit_m: 'm',
   },
   fr: {
-    nav_home: 'Accueil', nav_surf: 'Spots de surf', nav_weather: 'Météo', nav_webcams: 'Webcams',
+    nav_ficha: 'Fiche', nav_home: 'Accueil', nav_surf: 'Spots de surf', nav_weather: 'Météo', nav_webcams: 'Webcams',
     hero_kicker: 'Fuerteventura', hero_title: 'Prévisions de surf à Fuerteventura',
     hero_sub: 'Houle, vent et météo en détail pour choisir votre spot. Modèle de vagues NOAA, vent et météo ECMWF, webcams en direct et satellite.',
     cta_surf: 'Explorer les spots', cta_cams: 'Webcams en direct', now_at: 'En ce moment à %1',
@@ -109,7 +109,7 @@ const I18N = {
     best_today: "Meilleur spot aujourd'hui", unit_m: 'm',
   },
   de: {
-    nav_home: 'Start', nav_surf: 'Surfspots', nav_weather: 'Wetter', nav_webcams: 'Webcams',
+    nav_ficha: 'Infos', nav_home: 'Start', nav_surf: 'Surfspots', nav_weather: 'Wetter', nav_webcams: 'Webcams',
     hero_kicker: 'Fuerteventura', hero_title: 'Surfvorhersage für Fuerteventura',
     hero_sub: 'Wellen, Swell, Wind und Wetter im Detail für die Spot-Wahl. NOAA-Wellenmodell, ECMWF-Wind und -Wetter, Live-Webcams und Satellit.',
     cta_surf: 'Surfspots entdecken', cta_cams: 'Live-Webcams', now_at: 'Gerade jetzt bei %1',

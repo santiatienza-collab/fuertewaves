@@ -219,3 +219,38 @@ html, body { overflow-x: clip; }
 .islands { pointer-events: auto; overflow-x: auto; flex-wrap: nowrap; scrollbar-width: none; }
 .islands::-webkit-scrollbar { display: none; }
 @media (max-width: 900px) { .hero-card > div:first-child { display: block; } }
+
+/* ---- MOVIL v2: datos arriba, mapa debajo; Ficha, Tiempo y Webcams en paginas aparte ---- */
+@media (min-width: 901px) { .tabs .tab-ficha { display: none; } }
+@media (max-width: 900px) {
+  .desk-only { display: none; }
+  .layout { display: flex; flex-direction: column; padding: 0 12px 24px; }
+  .panel { display: contents; }
+  #spothead { order: 1; padding-top: 14px; }
+  .tabpane { order: 2; margin-top: 14px; }
+  .mapcol { order: 3; margin: 16px -12px 0; height: 56vh; height: 56svh; min-height: 320px; max-height: 480px; }
+  .foot { order: 4; margin-top: 20px; }
+  body:not(.tab-surf) .mapcol { display: none; }
+  .tabs { gap: 4px; }
+  .tabs button { padding: 8px 2px; font-size: 10.5px; letter-spacing: .03em; }
+
+  /* esferas: tres columnas identicas */
+  .hero-card { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 12px 6px; align-items: start; }
+  .hero-card > div:first-child { grid-column: 1 / -1; display: flex; flex-wrap: wrap; align-items: baseline; gap: 4px 14px; }
+  .hero-card > div:first-child .lbl { flex-basis: 100%; }
+  .hero-card .big { font-size: 34px; }
+  .hero-card .dial, .hero-card .score { display: flex; flex-direction: column; align-items: center; padding: 0; text-align: center; }
+  .hero-card .lbl { min-height: 0; height: 14px; line-height: 14px; margin: 0 0 4px; text-align: center; }
+  .hero-card .dial svg { width: 76px; height: 76px; margin: 0 0 4px; }
+  .hero-card .score { padding-top: 18px; }
+  .hero-card .score .circle { width: 76px; height: 76px; margin: 0 0 4px; font-size: 30px; }
+  .hero-card .dial .v { font-size: 13px; }
+  .hero-card .dial .s { font-size: 10px; min-height: 26px; }
+  .hero-card .score .word { font-size: 11px; }
+  .legend { grid-column: 1 / -1; }
+}
+
+@media (max-width: 900px) {
+  .hero-card .score .circle { width: 62px; height: 62px; margin: 7px 0 4px; font-size: 28px; }
+  .hero-card > div:first-child .lbl { text-align: left; }
+}
