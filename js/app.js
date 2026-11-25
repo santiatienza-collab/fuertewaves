@@ -321,7 +321,7 @@ const ICON_EXPAND = '<svg viewBox="0 0 24 24" width="20" height="20" fill="none"
       const hours = state.fc.filter((h) => h.time >= nowHour());
       if (hours.length) html += '<div class="card">' + heroHTML(hours[0], s) + '</div>' + '<div class="panel-hours">' + hoursHTML(s, hours, state.dayIdx) + '</div>';
     }
-    html += '<div>' + tidesHTML(state.td) + '</div><div class="desk-only">' + infoHTML(s) + '</div>';
+    html += '<div class="tides-wrap">' + tidesHTML(state.td) + '</div><div class="desk-only">' + infoHTML(s) + '</div>';
     el.innerHTML = html;
     $('#tab-ficha').innerHTML = infoHTML(s);
   }

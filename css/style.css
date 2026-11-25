@@ -293,3 +293,28 @@ body.noscroll { overflow: hidden; }
   .hero-card .score .word { grid-area: w; font-size: 15px; align-self: start; }
   .hero-card .legend { padding-top: 10px; }
 }
+
+/* ---- MOVIL v4: Surfspots = datos compactos, mapa, prevision, mareas ---- */
+@media (max-width: 900px) {
+  body.tab-surf #tab-surf { display: contents; }
+  body.tab-surf #tab-surf > .card, body.tab-surf #tab-surf > .err { order: 2; margin-top: 10px; }
+  body.tab-surf .mapcol { order: 3; margin-top: 14px; height: 44vh; height: 44svh; min-height: 260px; max-height: 420px; }
+  body.tab-surf .panel-hours { order: 4; margin-top: 14px; }
+  body.tab-surf .tides-wrap { order: 5; margin-top: 14px; }
+  .foot { order: 9; }
+
+  /* datos del spot, compactos: una linea con la ola y tres casillas iguales */
+  .hero-card { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 6px; padding: 10px; }
+  .hero-card > div:first-child { grid-column: 1 / -1; display: flex; flex-wrap: wrap; align-items: baseline; gap: 2px 12px; padding: 0 0 8px; border-bottom: 1px solid var(--line); }
+  .hero-card > div:first-child .lbl { flex-basis: auto; }
+  .hero-card .big { font-size: 28px; }
+  .hero-card .kv { font-size: 14px; }
+  .hero-card .dial, .hero-card .score { display: flex; flex-direction: column; align-items: center; text-align: center; padding: 4px 0 0; border: 0; gap: 0; }
+  .hero-card .dial .lbl, .hero-card .score .lbl { display: block; height: auto; font-size: 10px; text-align: center; margin: 0 0 2px; }
+  .hero-card .dial svg { width: 58px; height: 58px; margin: 0; }
+  .hero-card .score .circle { width: 46px; height: 46px; margin: 6px 0 4px; font-size: 22px; }
+  .hero-card .dial .v { font-size: 12px; margin-top: 2px; }
+  .hero-card .dial .s { font-size: 9.5px; min-height: 0; line-height: 1.25; }
+  .hero-card .score .word { font-size: 11px; }
+  .hero-card .legend { grid-column: 1 / -1; margin-top: 4px; font-size: 10px; padding: 0; }
+}
