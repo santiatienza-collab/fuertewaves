@@ -284,3 +284,46 @@ body.noscroll { overflow: hidden; }
   body.mob #satmap { height: 300px; }
   body.mob .weather-grid { grid-template-columns: minmax(0, 1fr); }
 }
+
+/* ---- movil v6: barra minima (logo + secciones), idioma flotante, datos mas pequenos, mapa mas grande ---- */
+@media (max-width: 900px) {
+  body.mob .brand span { display: none; }
+  body.mob .bar { flex-wrap: nowrap; gap: 10px; padding: 6px 12px; align-items: center; }
+  body.mob .brand { flex: none; }
+  body.mob .brand img { width: 30px; height: 30px; }
+  body.mob .sections { order: 0; flex: 1; min-width: 0; width: auto; padding: 0; margin: 0; }
+  body.mob .sections button { padding: 6px 12px; font-size: 10.5px; }
+  body.mob .lang { position: fixed; top: calc(var(--barh, 46px) + 8px); left: 10px; z-index: 1200; margin: 0; flex-direction: column; gap: 6px; padding: 5px; border-radius: 14px; background: rgba(11,31,58,.92); border: 1px solid var(--line); box-shadow: 0 4px 14px rgba(0,0,0,.45); }
+  body.mob .lang button { width: 34px; height: 24px; opacity: 1; display: none; }
+  body.mob .lang button.on { display: block; order: -1; }
+  body.mob .lang.open button { display: block; }
+  body.mob #spothead { padding-left: 56px; padding-top: 12px; min-height: 52px; }
+  body.mob .spot-head h3 { font-size: 15px; }
+  body.mob .mapcol { height: 380px; margin-top: 12px; }
+  body.mob .hero-card { padding: 8px; gap: 4px; }
+  body.mob .hero-card > div:first-child { padding-bottom: 6px; flex-wrap: nowrap; align-items: baseline; gap: 10px; }
+  body.mob .hero-card > div:first-child .lbl { flex-basis: auto; display: none; }
+  body.mob .hero-card .big { font-size: 24px; }
+  body.mob .hero-card .kv { font-size: 12px; }
+  body.mob .hero-card .dial svg { width: 48px; height: 48px; margin-bottom: 2px; }
+  body.mob .hero-card .score .circle { width: 48px; height: 48px; font-size: 21px; margin-bottom: 2px; }
+  body.mob .hero-card .dial .lbl, body.mob .hero-card .score .lbl { height: 12px; line-height: 12px; font-size: 9px; margin-bottom: 2px; }
+  body.mob .hero-card .dial .v, body.mob .hero-card .score .word { font-size: 11.5px; }
+  body.mob .hero-card .dial .s { font-size: 9px; }
+  body.mob .hero-card .legend { display: none; }
+  body.mob .foot { padding-bottom: 38vh; }
+}
+@media (max-width: 900px) {
+  body.mob .sections { gap: 4px; justify-content: space-between; }
+  body.mob .sections button { padding: 6px 7px; font-size: 9px; letter-spacing: .02em; flex: 1 0 auto; }
+}
+@media (max-width: 900px) {
+  body.mob .sections { gap: 3px; }
+  body.mob .sections button { padding: 6px 5px; font-size: 8.5px; letter-spacing: 0; }
+  body.mob .bar { gap: 6px; padding: 6px 8px; }
+}
+@media (max-width: 900px) {
+  body.mob .brand img { width: 26px; height: 26px; }
+  body.mob .sections button { padding: 6px 4px; font-size: 8px; }
+  body.mob .bar { gap: 5px; padding: 6px 6px; }
+}

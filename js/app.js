@@ -351,8 +351,8 @@ const ICON_EXPAND = '<svg viewBox="0 0 24 24" width="20" height="20" fill="none"
   /* movil: barra de secciones (como la app) con resaltado al desplazar */
   const SEC_IDS = ['sec-now', 'sec-forecast', 'sec-tides', 'tab-cams', 'tab-weather', 'tab-ficha'];
   const SEC_LBL = {
-    es: ['Ahora', 'Previsión', 'Mareas', 'Webcams', 'Tiempo', 'Info'], en: ['Now', 'Forecast', 'Tides', 'Webcams', 'Weather', 'Info'],
-    fr: ['Maintenant', 'Prévision', 'Marées', 'Webcams', 'Météo', 'Infos'], de: ['Jetzt', 'Vorhersage', 'Gezeiten', 'Webcams', 'Wetter', 'Infos'],
+    es: ['Ahora', 'Previs.', 'Mareas', 'Cams', 'Tiempo', 'Info'], en: ['Now', 'Forecast', 'Tides', 'Cams', 'Weather', 'Info'],
+    fr: ['Ici', 'Prévis.', 'Marées', 'Cams', 'Météo', 'Infos'], de: ['Jetzt', 'Prognose', 'Tide', 'Cams', 'Wetter', 'Infos'],
   };
   let secOn = 0;
   function renderSections() {
@@ -362,10 +362,12 @@ const ICON_EXPAND = '<svg viewBox="0 0 24 24" width="20" height="20" fill="none"
   function goSec(id) {
     const el = document.getElementById(id) || $('#spothead');
     const y = el.getBoundingClientRect().top + window.scrollY - $('.bar').offsetHeight - 8;
+    lockUntil = Date.now() + 900; setTimeout(spy, 950);
     window.scrollTo({ top: Math.max(0, y), behavior: 'smooth' });
   }
+  let lockUntil = 0;
   function spy() {
-    if (!isMob()) return;
+    if (!isMob() || Date.now() < lockUntil) return;
     const hb = $('.bar').offsetHeight + 24;
     let idx = 0;
     SEC_IDS.forEach((id, i) => { const el = document.getElementById(id); if (el && el.getBoundingClientRect().top <= hb) idx = i; });
@@ -376,7 +378,8 @@ const ICON_EXPAND = '<svg viewBox="0 0 24 24" width="20" height="20" fill="none"
   }
   let spyT = 0;
   window.addEventListener('scroll', () => { if (!spyT) spyT = requestAnimationFrame(() => { spyT = 0; spy(); }); }, { passive: true });
-  window.addEventListener('resize', () => { showTab(state.tab, true); if (spotMap) spotMap.invalidateSize(); });
+  const setBarH = () => document.documentElement.style.setProperty('--barh', $('.bar').offsetHeight + 'px');
+  window.addEventListener('resize', () => { setBarH(); showTab(state.tab, true); if (spotMap) spotMap.invalidateSize(); });
 
   /* selector de spot (movil) */
   function renderSelect() {
@@ -515,7 +518,8 @@ const ICON_EXPAND = '<svg viewBox="0 0 24 24" width="20" height="20" fill="none"
     const b = e.target.closest('button, a');
     if (!b) return;
     if (b.dataset.tab) { showTab(b.dataset.tab); try { history.replaceState(null, "", "#" + b.dataset.tab); } catch (x) {} }
-    else if (b.dataset.lang) { lang = b.dataset.lang; try { localStorage.setItem('fw_lang', lang); } catch (x) {} applyLang(); }
+    else if (b.dataset.lang && isMob() && !b.closest('.lang').classList.contains('open')) { b.closest('.lang').classList.add('open'); }
+    else if (b.dataset.lang) { b.closest('.lang').classList.remove('open'); lang = b.dataset.lang; try { localStorage.setItem('fw_lang', lang); } catch (x) {} applyLang(); }
     else if (b.dataset.day !== undefined) { state.dayIdx = +b.dataset.day; renderPanel(); }
     else if (b.dataset.muni) { state.muni = MUNIS.concat(MUNIS_EXTRA).find((m) => m.name === b.dataset.muni); renderWeather(); }
     else if (b.dataset.sec) { secOn = SEC_IDS.indexOf(b.dataset.sec); $$('#sections button').forEach((x, i) => x.classList.toggle('on', i === secOn)); goSec(b.dataset.sec); }
@@ -530,6 +534,7 @@ const ICON_EXPAND = '<svg viewBox="0 0 24 24" width="20" height="20" fill="none"
   document.addEventListener('change', (e) => {
     if (e.target.id === 'spotsel') selectSpot(SPOTS.find((s) => s.id === e.target.value));
   });
+  document.addEventListener('click', (e) => { if (!e.target.closest('.lang')) $('.lang').classList.remove('open'); });
   document.addEventListener('keydown', (e) => {
     const fr = e.target.closest && e.target.closest('[data-play]');
     if (fr && (e.key === 'Enter' || e.key === ' ')) { e.preventDefault(); playCam(fr); }
@@ -542,6 +547,6 @@ const ICON_EXPAND = '<svg viewBox="0 0 24 24" width="20" height="20" fill="none"
   { const h = (new URLSearchParams(location.search).get("tab") || location.hash.slice(1)); if (["surf", "weather", "cams", "ficha"].includes(h)) showTab(h); }
   showTab(['surf', 'weather', 'cams', 'ficha'].includes(location.hash.slice(1)) ? location.hash.slice(1) : 'surf');
   selectSpot(SPOTS[0]);
-  showTab(state.tab, true);
+  showTab(state.tab, true); setBarH();
   window.addEventListener('load', () => { spotMap.invalidateSize(); satMap.invalidateSize(); });
 })();
