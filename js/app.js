@@ -2,6 +2,7 @@
 (function () {
   'use strict';
 
+const ICON_EXPAND = '<svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M14 4h6v6M10 20H4v-6M20 4l-7 7M4 20l7-7"/></svg>', ICON_CLOSE = '<svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round"><path d="M6 6l12 12M18 6L6 18"/></svg>';
   const TZ = 'Atlantic/Canary';
   const $ = (s, el = document) => el.querySelector(s);
   const $$ = (s, el = document) => Array.from(el.querySelectorAll(s));
@@ -402,7 +403,7 @@
     spotMap = L.map('spotmap', { zoomControl: true, zoomSnap: 0.25 }).setView(ISLANDS['Fuerteventura'].c, ISLANDS['Fuerteventura'].z);
     L.tileLayer(ESRI, { maxZoom: 18, attribution: 'Tiles © Esri' }).addTo(spotMap);
     const mc = $('.mapcol'), eb = document.createElement('button');
-    eb.className = 'expand'; eb.type = 'button'; eb.setAttribute('aria-label', 'Expand map'); eb.textContent = '⤢';
+    eb.className = 'expand'; eb.type = 'button'; eb.setAttribute('aria-label', 'Expand map'); eb.innerHTML = ICON_EXPAND;
     mc.appendChild(eb);
     const mobile = () => window.matchMedia('(max-width: 900px)').matches;
     const interactive = (on) => ['dragging', 'touchZoom', 'doubleClickZoom', 'scrollWheelZoom'].forEach((k) => spotMap[k][on || !mobile() ? 'enable' : 'disable']());
@@ -410,7 +411,7 @@
     eb.addEventListener('click', () => {
       const full = mc.classList.toggle('full');
       document.body.classList.toggle('noscroll', full);
-      eb.textContent = full ? '✕' : '⤢';
+      eb.innerHTML = full ? ICON_CLOSE : ICON_EXPAND;
       interactive(full); setTimeout(() => spotMap.invalidateSize(), 60);
     });
     SPOTS.forEach((s) => {
@@ -470,7 +471,7 @@
 
   document.addEventListener('click', (e) => {
     const xb = e.target.closest('[data-full]');
-    if (xb) { const c = xb.closest('.cam'), on = c.classList.toggle('full'); document.body.classList.toggle('noscroll', on); xb.textContent = on ? '✕' : '⤢'; const fr = c.querySelector('[data-play]'); if (on && fr) playCam(fr); return; }
+    if (xb) { const c = xb.closest('.cam'), on = c.classList.toggle('full'); document.body.classList.toggle('noscroll', on); xb.innerHTML = on ? ICON_CLOSE : ICON_EXPAND; const fr = c.querySelector('[data-play]'); if (on && fr) playCam(fr); return; }
     const fr = e.target.closest('[data-play]');
     if (fr) { playCam(fr); return; }
     const b = e.target.closest('button, a');
