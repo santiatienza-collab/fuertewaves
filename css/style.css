@@ -189,3 +189,33 @@ svg.tide { width: 100%; height: 110px; display: block; }
 .hero-card .score .circle { width: 64px; height: 64px; margin: 0 auto 6px; }
 @media (max-width: 560px) { .hero-card { grid-template-columns: repeat(2, minmax(0, 1fr)); } .hero-card .score { padding-top: 0; } }
 
+
+/* ---- movil / seleccion de isla / pestanas ---- */
+html { -webkit-text-size-adjust: 100%; text-size-adjust: 100%; }
+html, body { overflow-x: clip; }
+.tabs button.on, .tabs button[aria-selected="true"] { background: var(--orange); color: var(--navy); border-color: var(--orange); }
+.tabs button { -webkit-tap-highlight-color: transparent; touch-action: manipulation; }
+.islands { position: absolute; z-index: 600; left: 64px; right: 24px; top: 24px; margin: 0; padding: 0; gap: 6px; pointer-events: none; }
+.islands .chip { pointer-events: auto; padding: 5px 10px; font-size: 11px; background: rgba(11,31,58,.88); backdrop-filter: blur(4px); }
+.islands .chip.on { background: var(--orange); }
+.leaflet-top.leaflet-left { top: 4px; }
+@media (max-width: 900px) {
+  .layout { display: block; height: auto; }
+  .mapcol { position: relative; top: auto; height: 50vh; height: 50svh; min-height: 300px; max-height: 460px; z-index: 1; }
+  .islands { left: 56px; right: 14px; top: 14px; }
+  .panel { overflow: visible; padding: 14px 12px 28px; }
+  .bar { height: auto; }
+  .spot-head h3 { font-size: 15px; overflow-wrap: anywhere; }
+  .hero-card { grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px; }
+  .hero-card > div:first-child { grid-column: 1 / -1; display: flex; align-items: baseline; gap: 14px; flex-wrap: wrap; }
+  .hero-card .score { padding-top: 0; }
+  .hero-card .lbl { min-height: 0; }
+  .hero-card .dial svg { width: 70px; height: 70px; }
+  .hero-card .score .circle { width: 58px; height: 58px; }
+  .big { font-size: 30px; }
+  .cams { grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); }
+  #spotsel { font-size: 16px; }
+}
+.islands { pointer-events: auto; overflow-x: auto; flex-wrap: nowrap; scrollbar-width: none; }
+.islands::-webkit-scrollbar { display: none; }
+@media (max-width: 900px) { .hero-card > div:first-child { display: block; } }
